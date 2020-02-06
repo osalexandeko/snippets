@@ -5,7 +5,7 @@
 
 #define ARR_SRC_SIZE 1024
 
-void printAr(uint8_t *arr, int len) 
+void printAr(uint8_t *arr, int len)  
 {
   printf("\n");
   for (int i = 0; i < len; i++) {
