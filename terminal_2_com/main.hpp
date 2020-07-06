@@ -48,6 +48,7 @@ typedef enum {
 	HELP,
 	TRCV,
 	EXIT,
+	CMD_3,
 	CMD_42,
 	CMD_56,
 	CMD_142,

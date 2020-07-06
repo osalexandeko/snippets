@@ -15,38 +15,42 @@ info_pair_map_t com_info_pairs;
 
 /*used to send commands*/
 static uint8_t CMD_AR[CMD_ARR_SZ] = {0};					
-					
 
+/*global serial buffer*/					
+static uint8_t gSerialBuffer[SERIAL_BUFFER_MAX_SIZE];
 
 
 
 /*init commands*/
 void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info_pairs){
-	 command_pairs.insert(command_pair_t( "help",HELP)); 
-	 com_info_pairs.insert(info_pair_t( HELP,"help command")); 
+	command_pairs.insert(command_pair_t( "help",HELP)); 
+	com_info_pairs.insert(info_pair_t( HELP,"help command")); 
 	
-	 command_pairs.insert(command_pair_t( "trcv",TRCV));
-	 com_info_pairs.insert(info_pair_t( TRCV,"trcv command syntax: trcv <file name>")); 
-
-	 command_pairs.insert(command_pair_t( "42",CMD_42));
-	 com_info_pairs.insert(info_pair_t( CMD_42,"42 command syntax: 42 dim")); 
+	command_pairs.insert(command_pair_t( "trcv",TRCV));
+	com_info_pairs.insert(info_pair_t( TRCV,"trcv command syntax: trcv <file name>")); 
 	
-	 command_pairs.insert(command_pair_t( "56",CMD_56));
-	 com_info_pairs.insert(info_pair_t( CMD_56,"get status: 56")); 
-	 
-	 
-	 command_pairs.insert(command_pair_t( "142",CMD_142));
-	 com_info_pairs.insert(info_pair_t( CMD_142,"142 command syntax: min dim max,")); 
-	 
-	 command_pairs.insert(command_pair_t( "145",CMD_145));
-	 com_info_pairs.insert(info_pair_t( CMD_145,"145 command is taken from cmd145.txt")); 
-	 
-	 command_pairs.insert(command_pair_t( "146",CMD_146));
-	 com_info_pairs.insert(info_pair_t( CMD_146,"146 command is taken from cmd146.txt")); 
-	 
-	 
-	 command_pairs.insert(command_pair_t( "exit",EXIT));
-	 com_info_pairs.insert(info_pair_t( EXIT,"exit command")); 
+	command_pairs.insert(command_pair_t( "3",CMD_3));
+	com_info_pairs.insert(info_pair_t( CMD_3,"3 command syntax: 3 power[Watt]")); 
+	
+	command_pairs.insert(command_pair_t( "42",CMD_42));
+	com_info_pairs.insert(info_pair_t( CMD_42,"42 command syntax: 42 dim")); 
+	
+	command_pairs.insert(command_pair_t( "56",CMD_56));
+	com_info_pairs.insert(info_pair_t( CMD_56,"get status: 56")); 
+	
+	
+	command_pairs.insert(command_pair_t( "142",CMD_142));
+	com_info_pairs.insert(info_pair_t( CMD_142,"142 command syntax: min dim max,")); 
+	
+	command_pairs.insert(command_pair_t( "145",CMD_145));
+	com_info_pairs.insert(info_pair_t( CMD_145,"145 command is taken from cmd145.txt")); 
+	
+	command_pairs.insert(command_pair_t( "146",CMD_146));
+	com_info_pairs.insert(info_pair_t( CMD_146,"146 command is taken from cmd146.txt")); 
+	
+	
+	command_pairs.insert(command_pair_t( "exit",EXIT));
+	com_info_pairs.insert(info_pair_t( EXIT,"exit command")); 
 }
 
 /*init serial*/
@@ -109,7 +113,7 @@ void write_serial_cmd(uint8_t lpBuffer[], size_t sz ){
 }
 
 /*read serial responce*/
-void read_serial_resp(void){
+void read_serial_resp(uint8_t * sRsp){
 	//read   
     char TempChar; //Temporary character used for reading
 	uint8_t SerialBuffer[SERIAL_BUFFER_MAX_SIZE];//Buffer for storing Rxed Data
@@ -138,6 +142,7 @@ void read_serial_resp(void){
    	printf("\nRX Dec: ");
     for(int j =0;  j < i; j++){
 		printf("%d ", SerialBuffer[j]);
+		sRsp[j] = SerialBuffer[j]; //clean buffer.
    	}
     
     printf("\n");
@@ -189,20 +194,36 @@ void cmd(void){
 				break;
 			}
 			
+			case CMD_3:{
+				takeFromFile("./cmd3.txt", CMD_AR,sz);
+				if (1 <= argc){
+					CMD_AR[8]   = stoi(cmdArgs[1]);
+				}
+				printf("power : %d [Watt] \n",CMD_AR[8] );
+				write_serial_cmd( CMD_AR, sz);  
+				read_serial_resp(gSerialBuffer);
+				break;
+			}
+			
+			
 			case CMD_42:{
 				takeFromFile("./cmd42.txt", CMD_AR,sz);
 				if (1 <= argc){
 					CMD_AR[8]   = stoi(cmdArgs[1]);
 				}
 				write_serial_cmd( CMD_AR, sz);  
-				read_serial_resp();
+				read_serial_resp(gSerialBuffer);
 				break;
-			}
+			} 
 			
 			case CMD_56:{
 				takeFromFile("./cmd56.txt", CMD_AR,sz);
 				write_serial_cmd( CMD_AR, sz);  
-				read_serial_resp();
+				read_serial_resp(gSerialBuffer);
+				
+				printf("power : %d [Watt] \n",gSerialBuffer[8] );
+				printf("Max power : %d [Watt] \n",gSerialBuffer[9] );
+				
 				break;
 			}
 			
@@ -210,7 +231,7 @@ void cmd(void){
 				
 				takeFromFile("./cmd142.txt", CMD_AR,sz);
 				write_serial_cmd( CMD_AR, sz);  
-	            read_serial_resp();
+	            read_serial_resp(gSerialBuffer);
 				break;
 			}
 			
@@ -218,7 +239,7 @@ void cmd(void){
 				
 				takeFromFile("./cmd145.txt", CMD_AR,sz);
 				write_serial_cmd( CMD_AR, sz);  
-				read_serial_resp();
+				read_serial_resp(gSerialBuffer);
 				break;	
 			}
 			
@@ -226,7 +247,7 @@ void cmd(void){
 				
 				takeFromFile("./cmd146.txt", CMD_AR,sz);
 				write_serial_cmd( CMD_AR, sz);  
-				read_serial_resp();
+				read_serial_resp(gSerialBuffer);
 				break;	
 			}
 			
