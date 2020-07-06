@@ -7,7 +7,7 @@
 
 void printAr(uint8_t* arr,   int len) {
 	
-	
+	 
 	
 	
   printf("\n");

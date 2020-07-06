@@ -21,6 +21,8 @@ void*body(void*arg){
 	return NULL;
 }
 
+
+
 int main(){
 	
 //	struct sched_param param;
@@ -132,7 +134,7 @@ int main(){
 	printf("%d \n", fifo_param3.sched_priority);
 
 	
-//
+
 //	err = pthread_create(&t1, &myattr, body, (void*)"1");
 //	err = pthread_create(&t2, &myattr, body, (void*)"2");
 //	err = pthread_create(&t3, &myattr, body, (void*)"3");
