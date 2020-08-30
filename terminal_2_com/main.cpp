@@ -43,7 +43,7 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	com_info_pairs.insert(info_pair_t( CMD_142,"142 command syntax: min dim max,")); 
 	
 	command_pairs.insert(command_pair_t( "145",CMD_145));
-	com_info_pairs.insert(info_pair_t( CMD_145,"145 command is taken from cmd145.txt")); 
+	com_info_pairs.insert(info_pair_t( CMD_145,"145 command is taken from cmd145.txt\n If 145 19 then open loop table")); 
 	
 	command_pairs.insert(command_pair_t( "146",CMD_146));
 	com_info_pairs.insert(info_pair_t( CMD_146,"146 command is taken from cmd146.txt")); 
@@ -237,7 +237,12 @@ void cmd(void){
 			
 			case CMD_145:{
 				
+				printf("%d \n", CMD_AR[25]);
+				
 				takeFromFile("./cmd145.txt", CMD_AR,sz);
+				if (1 <= argc){
+					CMD_AR[24]   = stoi(cmdArgs[1]);
+				}
 				write_serial_cmd( CMD_AR, sz);  
 				read_serial_resp(gSerialBuffer);
 				break;	

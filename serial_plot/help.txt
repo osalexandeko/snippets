@@ -1,0 +1,3 @@
+https://github.com/vichargrave/wqueue/blob/master/wqueue.h
+https://github.com/vichargrave/wqueue
+main :: https://vichargrave.github.io/multithreaded-work-queue-in-cpp/
