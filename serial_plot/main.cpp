@@ -41,7 +41,9 @@ uint8_t RxCBf1[RX_SER_BUF_MAX_SZ];
 uint8_t RxCBf2[RX_SER_BUF_MAX_SZ];
 
 //test1
-
+#define SERIAL_BUFFER_MULT 16
+#define GUI_BUFF_SZ SERIAL_BUFFER_MAX_SIZE*SERIAL_BUFFER_MULT
+float gui_buff[GUI_BUFF_SZ];
 //etest1
 
 
@@ -62,6 +64,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     MSG msg;
     BOOL bQuit = FALSE;
     float theta = 0.0f;
+    uint8_t currentRxBuffUart = 0;
 
     /* register window class */
     wc.style = CS_OWNDC;
@@ -120,7 +123,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
 	printf("hi");
  	 
 	 
-	
+	currentRxBuffUart = consSer->getCurrBuffNum();
     /* program main loop */
     while (!bQuit)
     { 
@@ -184,7 +187,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
 			glEnd();
 			
 			
-			//draws the graph
+			//draws the graph 
 			glBegin(GL_LINE_STRIP);
 			 
 //			for (t=T_MIN;t<=T_MAX;t+=T_PRECISION) {
@@ -192,12 +195,45 @@ int WINAPI WinMain (HINSTANCE hInstance,
 //				//glVertex2d(func_test(t),t);
 //			}   
 
-			for (int i =0; i<=SERIAL_BUFFER_MAX_SIZE ;i++) {
-				//glVertex2d(i/255.0,func_test(i)/255.0);
-				//glVertex2d(func_test(i),i);
-				//printf("%f\n",consSer->getRxData()[i]/255.0);
-			 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
-			} 
+			 
+//			for (int i =0; i<=((SERIAL_BUFFER_MAX_SIZE + 1)/2 );i++) {
+//			
+//			 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
+//					  
+//			} 
+//			
+//			static int one_shot = 1;
+//			if(one_shot){
+//				one_shot = 0;
+//				for (int i = 1 + (SERIAL_BUFFER_MAX_SIZE + 1)/2; i<=SERIAL_BUFFER_MAX_SIZE ;i++) {
+//				
+//				 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
+//						  
+//				} 
+//			}
+		
+				
+				int static gui_buf_step = 1;
+				
+				if(consSer->getCurrBuffNum() != currentRxBuffUart){
+					gui_buf_step++;
+					if(SERIAL_BUFFER_MULT == gui_buf_step){
+						gui_buf_step = 1;
+					}
+				}
+				for(int j = 0; j < SERIAL_BUFFER_MAX_SIZE; j++){
+				
+					//gui_buff[j] = consSer->getRxData()[j]/255.0;
+					gui_buff[j+SERIAL_BUFFER_MAX_SIZE*gui_buf_step] = consSer->getRxData()[j]/255.0;
+					
+				}
+  
+				for (int i =0; i<= GUI_BUFF_SZ ;i++) {
+			
+			 		glVertex2d((i/100.0 ) -1.1  ,gui_buff[i]);
+					  
+				}  
+			 
 			
 			
 			glEnd();         
@@ -206,7 +242,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
 			theta += .01f;
 			Sleep (10);  
         } 
-    }
+    } 
 
     /* shutdown OpenGL */ 
     DisableOpenGL (hWnd, hDC, hRC);

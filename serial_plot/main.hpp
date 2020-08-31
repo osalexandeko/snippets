@@ -27,6 +27,6 @@ using namespace std;
 #define T_PRECISION 0.001
 
 /*global serial buffer*/
-#define  SERIAL_BUFFER_MAX_SIZE  256			
+#define  SERIAL_BUFFER_MAX_SIZE  RX_SER_BUF_MAX_SZ			
 
 #endif

@@ -6,7 +6,7 @@
 extern HANDLE serialHandle;
 
 /*global serial buffer*/
-#define  RX_SER_BUF_MAX_SZ 256 
+#define  RX_SER_BUF_MAX_SZ 16 
 
 
 void init_serial(string & comPort);
@@ -18,6 +18,7 @@ class SerialConsumerThread : public Thread{
   uint8_t * RxCBfP[NUM_OF_BUFFS];
   int rx_ind = 0;
   int ready_ind = 1;
+   
   
   public:
     SerialConsumerThread(wqueue<uint8_t>& queue, uint8_t *  bf1, uint8_t *  bf2  ) : 
@@ -40,6 +41,7 @@ class SerialConsumerThread : public Thread{
 					ready_ind = 1;
 				}
             	i = 0;
+            	 
 			}
 		}
         return NULL;
@@ -48,6 +50,10 @@ class SerialConsumerThread : public Thread{
     /*get ready to read data array*/
     uint8_t * getRxData(){
     	return RxCBfP[ready_ind];
+	}
+	
+	uint8_t getCurrBuffNum(){
+		return rx_ind;
 	}
 };
 
