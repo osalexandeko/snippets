@@ -6,7 +6,7 @@
 extern HANDLE serialHandle;
 
 /*global serial buffer*/
-#define  RX_SER_BUF_MAX_SZ 16 
+#define  RX_SER_BUF_MAX_SZ 8 
 
 
 void init_serial(string & comPort);
@@ -30,9 +30,9 @@ class SerialConsumerThread : public Thread{
 	}
     void* run() {
         for (int i = 0;; i++) {
-            RxCBfP[rx_ind][i] = m_queue.remove();
+            
             //printf("%d\n",RxCBfP[rx_ind][i]);
-            if(i > RX_SER_BUF_MAX_SZ - 1){ /*the buffer is full, switch it*/
+            if( RX_SER_BUF_MAX_SZ - 1 < i ){ /*the buffer is full, switch it*/
             	if(0 == rx_ind){
             		rx_ind = 1;
 					ready_ind = 0;	
@@ -43,6 +43,8 @@ class SerialConsumerThread : public Thread{
             	i = 0;
             	 
 			}
+			RxCBfP[rx_ind][i] = m_queue.remove();
+			printf("%u %u\n",rx_ind , RxCBfP[ready_ind][i]);
 		}
         return NULL;
     }
@@ -71,7 +73,7 @@ class SerialProduserThread : public Thread{
 			/*read 1 byte from uart and put to queue*/
 			do{
 				ReadFile( serialHandle,&item,sizeof(uint8_t) ,&NoBytesRead,NULL);
-				printf("%u %u\n",NoBytesRead , item);
+				//printf("%u %u\n",NoBytesRead , item);
 			}while (NoBytesRead == 0);
 			NoBytesRead = 0;
 		    //m_queue.add(item);0.25*sin(10*(x));/

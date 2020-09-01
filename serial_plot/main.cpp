@@ -10,14 +10,14 @@ static uint8_t gSerialBuffer[SERIAL_BUFFER_MAX_SIZE];
  * Function Declarations
  *
  **************************/
-// 
+//  
 //
 //
 //void * serial_task(void * p){
 //	while(1){
 //		read_serial_resp(gSerialBuffer);
 //	}
-//}
+//} 
 
  
 
@@ -41,7 +41,7 @@ uint8_t RxCBf1[RX_SER_BUF_MAX_SZ];
 uint8_t RxCBf2[RX_SER_BUF_MAX_SZ];
 
 //test1
-#define SERIAL_BUFFER_MULT 16
+#define SERIAL_BUFFER_MULT 32
 #define GUI_BUFF_SZ SERIAL_BUFFER_MAX_SIZE*SERIAL_BUFFER_MULT
 float gui_buff[GUI_BUFF_SZ];
 //etest1
@@ -65,6 +65,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     BOOL bQuit = FALSE;
     float theta = 0.0f;
     uint8_t currentRxBuffUart = 0;
+    int static gui_buf_step = 0;
 
     /* register window class */
     wc.style = CS_OWNDC;
@@ -184,8 +185,8 @@ int WINAPI WinMain (HINSTANCE hInstance,
 				glVertex2d(0,t);
 				//glVertex2d(func_test(t),t); 
 			}
-			glEnd();
-			
+			glEnd(); 
+			 
 			
 			//draws the graph 
 			glBegin(GL_LINE_STRIP);
@@ -209,33 +210,36 @@ int WINAPI WinMain (HINSTANCE hInstance,
 //				
 //				 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
 //						  
-//				} 
+//				}  
 //			}
 		
-				
-				int static gui_buf_step = 1;
-				
-				if(consSer->getCurrBuffNum() != currentRxBuffUart){
+				 
+				   
+				 
+				if(consSer->getCurrBuffNum() != currentRxBuffUart)
+				{
+					currentRxBuffUart = consSer->getCurrBuffNum();
 					gui_buf_step++;
 					if(SERIAL_BUFFER_MULT == gui_buf_step){
-						gui_buf_step = 1;
+						gui_buf_step = 0;
 					}
 				}
-				for(int j = 0; j < SERIAL_BUFFER_MAX_SIZE; j++){
+				for(int j = 0; SERIAL_BUFFER_MAX_SIZE > j; j++){
 				
-					//gui_buff[j] = consSer->getRxData()[j]/255.0;
+				 
+					   
 					gui_buff[j+SERIAL_BUFFER_MAX_SIZE*gui_buf_step] = consSer->getRxData()[j]/255.0;
 					
 				}
-  
-				for (int i =0; i<= GUI_BUFF_SZ ;i++) {
+    
+				for (int i =0; GUI_BUFF_SZ > i ;i++) {
 			
-			 		glVertex2d((i/100.0 ) -1.1  ,gui_buff[i]);
+			 		glVertex2d((i/100.0 ) -1.0  ,gui_buff[i]);
 					  
-				}  
+				}    
 			 
 			
-			
+			 
 			glEnd();         
 			glPopMatrix ();     
 			SwapBuffers (hDC);  

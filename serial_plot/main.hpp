@@ -14,7 +14,7 @@
 #include <pthread.h>
 #include "thread.h"
 #include "wqueue.h"
-#include "serial.hpp"
+#include "serial.h"
 
 #include <stdio.h>
 #include <io.h>
