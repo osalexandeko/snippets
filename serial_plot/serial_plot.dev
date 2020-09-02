@@ -121,7 +121,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit8]
-FileName=serial.hpp
+FileName=serial.h
 CompileCpp=1
 Folder=
 Compile=1

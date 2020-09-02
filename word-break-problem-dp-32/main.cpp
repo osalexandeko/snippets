@@ -57,7 +57,7 @@ bool wordBreak(string s)
         // Check all the substring from the indexes matched 
         // earlier. If any of that substring matches than 
         // make flag value = 1; 
-        for (int j = msize - 1; j >= 0; j--) { 
+        for (int j = msize - 1; 0 <= j; j--) { 
   
             // sb is substring starting from matched_index[j] 
             // + 1  and of length i - matched_index[j] 

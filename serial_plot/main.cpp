@@ -1,22 +1,22 @@
 /**************************
  * Includes
- *
+ * 
  **************************/
 #include "main.hpp"		
 static uint8_t gSerialBuffer[SERIAL_BUFFER_MAX_SIZE];
 
-
+    
 /**************************
- * Function Declarations
- *
- **************************/
+ * Function Declarations  
+ * 
+ **************************/ 
+//     
+//
 //  
-//
-//
-//void * serial_task(void * p){
+//void * serial_task(void * p){  
 //	while(1){
 //		read_serial_resp(gSerialBuffer);
-//	}
+//	} 
 //} 
 
  
@@ -65,6 +65,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     BOOL bQuit = FALSE;
     float theta = 0.0f;
     uint8_t currentRxBuffUart = 0;
+    bool static shift_gui_buffer = false;
     int static gui_buf_step = 0;
 
     /* register window class */
@@ -75,15 +76,15 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wc.hInstance = hInstance;
     wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
     wc.hCursor = LoadCursor (NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH) GetStockObject (BLACK_BRUSH);
+    wc.hbrBackground = (HBRUSH) GetStockObject (DKGRAY_BRUSH);
     wc.lpszMenuName = NULL;
     wc.lpszClassName = "GLSample";
     RegisterClass (&wc); 
 
     /* create main window */
     hWnd = CreateWindow (
-      "GLSample", "OpenGL Sample", 
-      WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE,
+      "GLSample", "Serial Plot", 
+      WS_CAPTION | WS_POPUPWINDOW | WS_VISIBLE |WS_MINIMIZEBOX| WS_MAXIMIZEBOX,
       0, 0, 5*256, 4*256,
       NULL, NULL, hInstance, NULL);
       
@@ -145,24 +146,8 @@ int WINAPI WinMain (HINSTANCE hInstance,
         else  
         {
             /* OpenGL animation code goes here */
-
-//            glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-//            glClear (GL_COLOR_BUFFER_BIT);
-//
-//            glPushMatrix ();
-//            glRotatef (theta, 0.0f, 0.0f, 1.0f);
-//            glBegin (GL_TRIANGLES);
-//            glColor3f (1.0f, 0.0f, 0.0f);   glVertex2f (0.0f, 1.0f);
-//            glColor3f (0.0f, 1.0f, 0.0f);   glVertex2f (0.108f, -0.5f);
-//            glColor3f (0.0f, 0.0f, 1.0f);   glVertex2f (-0.87f, -0.5f);
-//            glEnd ();
-//            glPopMatrix ();
-//
-//            SwapBuffers (hDC);
-//
-//            theta += 1.0f;
-			
 			glPushMatrix ();
+			glColor3d(3,1,0.2);
 			//glRotatef (theta, 0.0f, 0.0f, 1.0f);
 			double t;
 			 
@@ -172,63 +157,66 @@ int WINAPI WinMain (HINSTANCE hInstance,
 			glBegin(GL_LINE_STRIP);
 			
 			for (t=T_MIN;t<=T_MAX;t+=T_PRECISION) {
+			 
 				glVertex2d(t,0);
 			//glVertex2d(func_test(t),t);
 			}
 			glEnd();
 			
-			//draw y
 			
+			glBegin(GL_LINE_STRIP);
+			for (t=-0.01;t<=0.01;t+=0.005) { 
+			 
+				glVertex2d(t,0.5);
+			//glVertex2d(func_test(t),t);
+			}
+			glEnd();
+			
+			//draw y
 			glBegin(GL_LINE_STRIP);
 			
 				for (t=T_MIN;t<=T_MAX;t+=T_PRECISION) {
 				glVertex2d(0,t);
+				 
 				//glVertex2d(func_test(t),t); 
 			}
 			glEnd(); 
 			 
 			
 			//draws the graph 
-			glBegin(GL_LINE_STRIP);
-			 
-//			for (t=T_MIN;t<=T_MAX;t+=T_PRECISION) {
-//				//glVertex2d(t,func_test(t-theta)); 
-//				//glVertex2d(func_test(t),t);
-//			}   
-
-			 
-//			for (int i =0; i<=((SERIAL_BUFFER_MAX_SIZE + 1)/2 );i++) {
-//			
-//			 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
-//					  
-//			} 
-//			
-//			static int one_shot = 1;
-//			if(one_shot){
-//				one_shot = 0;
-//				for (int i = 1 + (SERIAL_BUFFER_MAX_SIZE + 1)/2; i<=SERIAL_BUFFER_MAX_SIZE ;i++) {
-//				
-//				 	glVertex2d((i/100.0 ) -1.0 ,consSer->getRxData()[i]/255.0);
-//						  
-//				}  
-//			}
-		
-				 
-				   
-				 
-				if(consSer->getCurrBuffNum() != currentRxBuffUart)
-				{
+			glColor3d(1,1,1);
+			glBegin(GL_LINES);
+					 
+				if(consSer->getCurrBuffNum() != currentRxBuffUart){
 					currentRxBuffUart = consSer->getCurrBuffNum();
 					gui_buf_step++;
+					shift_gui_buffer = true;
 					if(SERIAL_BUFFER_MULT == gui_buf_step){
 						gui_buf_step = 0;
 					}
 				}
-				for(int j = 0; SERIAL_BUFFER_MAX_SIZE > j; j++){
 				
-				 
-					   
-					gui_buff[j+SERIAL_BUFFER_MAX_SIZE*gui_buf_step] = consSer->getRxData()[j]/255.0;
+				
+//				for(int j = 0; SERIAL_BUFFER_MAX_SIZE > j; j++){
+//					gui_buff[j+SERIAL_BUFFER_MAX_SIZE*gui_buf_step] = consSer->getRxData()[j]/255.0;
+//				}
+				
+				for(int j = 0; SERIAL_BUFFER_MAX_SIZE > j; j++){
+ 					gui_buff[(GUI_BUFF_SZ -1) -(j +SERIAL_BUFFER_MAX_SIZE*gui_buf_step)] = consSer->getRxData()[j]/255.0;
+ 				}
+				
+				/*shift left the gui buffer.*/
+				if(true == shift_gui_buffer ){
+					
+					
+//					shift_gui_buffer = false;
+//					for(int j = 0; SERIAL_BUFFER_MAX_SIZE > j; j++){
+//						for(int i = 1; GUI_BUFF_SZ > i; i++){
+//					 		gui_buff[i - 1] = gui_buff[i];
+//					 		
+//						}
+//						gui_buff[GUI_BUFF_SZ - 1] = 0;
+//					}
 					
 				}
     
@@ -237,14 +225,12 @@ int WINAPI WinMain (HINSTANCE hInstance,
 			 		glVertex2d((i/100.0 ) -1.0  ,gui_buff[i]);
 					  
 				}    
-			 
 			
-			 
 			glEnd();         
 			glPopMatrix ();     
 			SwapBuffers (hDC);  
 			theta += .01f;
-			Sleep (10);  
+			Sleep (1);  
         } 
     } 
 
