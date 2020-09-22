@@ -9,7 +9,7 @@ command_pair_map_t command_pairs;
 /*command info pairs*/
 info_pair_map_t com_info_pairs;
 
-/*array with the command*/
+ 
 
 
 
@@ -18,6 +18,11 @@ static uint8_t CMD_AR[CMD_ARR_SZ] = {0};
 
 /*global serial buffer*/					
 static uint8_t gSerialBuffer[SERIAL_BUFFER_MAX_SIZE];
+
+/*serial number*/
+uint8_t sn = 0;
+uint8_t sn_wait_cnt =0;
+#define MAX_SN_WAIT  (10)
 
 
 
@@ -47,6 +52,10 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	
 	command_pairs.insert(command_pair_t( "146",CMD_146));
 	com_info_pairs.insert(info_pair_t( CMD_146,"146 command is taken from cmd146.txt")); 
+	 
+	
+	command_pairs.insert(command_pair_t( "254",OPCOD_GPIO_TEST));
+	com_info_pairs.insert(info_pair_t( OPCOD_GPIO_TEST,"254, OPCOD_GPIO_TEST , use: 254 + enter")); 
 	
 	
 	command_pairs.insert(command_pair_t( "exit",EXIT));
@@ -130,6 +139,9 @@ void read_serial_resp(uint8_t * sRsp){
 	
 	   SerialBuffer[i] = TempChar;// Store Tempchar into buffer
 	   i++;
+	   if(SERIAL_BUFFER_MAX_SIZE <= i){
+			break;
+	   }
 	  }
 	
 	while (NoBytesRead > 0);
@@ -167,6 +179,7 @@ void cmd(void){
 	string  userInput;
 	string cmdArgs[CMD_ARGS_MAX_NUM];
 	int argc;
+	memset(gSerialBuffer,0,SERIAL_BUFFER_MAX_SIZE);
 	do{
 		getline(std::cin, userInput);
 		parseUserInput(userInput,cmdArgs,&argc);
@@ -230,6 +243,7 @@ void cmd(void){
 			case CMD_142:{
 				
 				takeFromFile("./cmd142.txt", CMD_AR,sz);
+				
 				write_serial_cmd( CMD_AR, sz);  
 	            read_serial_resp(gSerialBuffer);
 				break;
@@ -249,12 +263,54 @@ void cmd(void){
 			}
 			
 			case CMD_146:{
-				
 				takeFromFile("./cmd146.txt", CMD_AR,sz);
 				write_serial_cmd( CMD_AR, sz);  
 				read_serial_resp(gSerialBuffer);
 				break;	
 			}
+			
+			case OPCOD_GPIO_TEST:{
+				/*
+				PD0	A2D	CS_UVC1	Analog measurment UVC1
+				PD1		CS_UVC2	Analog measurment UVC2
+				PD2		CS_UVC3	Analog measurment UVC3
+				PD3		CS_UVC4	Analog measurment UVC4
+				PA8	Control FANs	MODE_SELECT	1'- FANs ON and UVC dimming EN. '0' FANs off and UVC dimming disabled.
+				PD13	PIR INPUT	PIR_IN	Input From Relay. Normally close- "0". Will change to "1" when detects movement
+				*/
+				
+				takeFromFile("./cmd254.txt", CMD_AR,sz);
+				CMD_AR[CMD_ARR_SN_INDEX] = sn;
+				  
+				sn_wait_cnt = 0;
+				do{
+					write_serial_cmd( CMD_AR, sz);
+					sn_wait_cnt++;
+					read_serial_resp(gSerialBuffer);
+					if(MAX_SN_WAIT < sn_wait_cnt){
+						break;
+					}
+				}while(sn != gSerialBuffer[CMD_ARR_SN_INDEX]);
+				
+				if(MAX_SN_WAIT >= sn_wait_cnt){
+					cout << "###########################################"<<endl;
+					printf("Analog measurment UVC1 %d% \n",gSerialBuffer[8] );
+					printf("Analog measurment UVC2 %d% \n",gSerialBuffer[9] );
+					printf("Analog measurment UVC3 %d% \n",gSerialBuffer[10] );
+					printf("Analog measurment UVC4 %d% \n",gSerialBuffer[11] );
+					printf("MODE_SELECT %d% \n",gSerialBuffer[12] );
+					printf("PIR_IN %d% \n",gSerialBuffer[13] );
+					cout << "###########################################"<<endl;
+					
+				}else{
+					cout << "###########################################"<<endl;
+				 	cout << "PLEASE TRY AGAIN"<<endl;		
+					cout << "###########################################"<<endl;
+				}
+				
+				break;
+			}
+			
 			
 			case EXIT:{
 				CloseHandle(serialHandle);
@@ -304,13 +360,16 @@ int takeFromFile(string path, uint8_t * dst,size_t & sz){
 int main(int argc, char** argv) {
 	
  	if(MAIN_ARGS_MIN_NUMBER > argc ){
-		cout << "enter com port, example : COM15 "<< endl;
+		cout << "enter com port and serial number, example : COM15 77"<< endl;
 		exit(EXIT_FAILURE);
 	}
 	cout << "connecting to port: "<< argv[MAIN_ARGS_COM_PORT_INDEX] << endl;
 	initCommands(command_pairs,com_info_pairs);
 	string comPort = string(argv[MAIN_ARGS_COM_PORT_INDEX]);
 	init_serial(comPort);
+	
+	sn = atoi(argv[MAIN_ARGS_SN] );
+	printf("sn: %d\n", sn);
 	cmd();
 	return 0;
 }

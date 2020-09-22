@@ -35,14 +35,16 @@ using namespace std;
 #define CMD_ARGS_MAX_NUM 64
 #define MAIN_ARGS_MIN_NUMBER 2
 #define MAIN_ARGS_COM_PORT_INDEX 1
+#define MAIN_ARGS_SN 2
 
-#define  SERIAL_BUFFER_MAX_SIZE 256
+#define  SERIAL_BUFFER_MAX_SIZE 28
 #define  info_pair_map_t map<command_index_t,string>
 #define  info_pair_t pair<command_index_t,string> 
 #define  command_pair_map_t map<string,command_index_t>
 #define  command_pair_t pair<string,command_index_t> 
 
 #define CMD_ARR_SZ (255)
+#define CMD_ARR_SN_INDEX (6)
 
 typedef enum {
 	HELP,
@@ -54,6 +56,7 @@ typedef enum {
 	CMD_142,
 	CMD_145,
 	CMD_146,
+	OPCOD_GPIO_TEST                 = 254,
 	
 }command_index_t;
 

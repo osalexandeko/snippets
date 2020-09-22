@@ -38,7 +38,7 @@ bool wordBreak(string s)
     // Create the DP table to store results of subroblems. 
     // The value dp[i] will be true if str[0..i] can be 
     // segmented into dictionary words, otherwise false. 
-    vector<bool> dp(n + 1, 0); // Initialize all values 
+    vector<bool> dp(n , false); // Initialize all values 
     // as false. 
   
     // matched_index array represents the indexes for which 
