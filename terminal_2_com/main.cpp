@@ -22,7 +22,7 @@ static uint8_t gSerialBuffer[SERIAL_BUFFER_MAX_SIZE];
 /*serial number*/
 uint8_t sn = 0;
 uint8_t sn_wait_cnt =0;
-#define MAX_SN_WAIT  (10)
+#define MAX_SN_WAIT  (100)
 
 
 
@@ -38,14 +38,14 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	com_info_pairs.insert(info_pair_t( CMD_3,"3 command syntax: 3 power[Watt]")); 
 	
 	command_pairs.insert(command_pair_t( "42",CMD_42));
-	com_info_pairs.insert(info_pair_t( CMD_42,"42 command syntax: 42 dim")); 
+	com_info_pairs.insert(info_pair_t( CMD_42,"dimming, 42 command syntax: 42 dim")); 
 	
 	command_pairs.insert(command_pair_t( "56",CMD_56));
 	com_info_pairs.insert(info_pair_t( CMD_56,"get status: 56")); 
 	
 	
 	command_pairs.insert(command_pair_t( "142",CMD_142));
-	com_info_pairs.insert(info_pair_t( CMD_142,"142 command syntax: min dim max,")); 
+	com_info_pairs.insert(info_pair_t( CMD_142,"142 +(color ratio config) + enter")); 
 	
 	command_pairs.insert(command_pair_t( "145",CMD_145));
 	com_info_pairs.insert(info_pair_t( CMD_145,"145 command is taken from cmd145.txt\n If 145 19 then open loop table")); 
@@ -55,7 +55,7 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	 
 	
 	command_pairs.insert(command_pair_t( "254",OPCOD_GPIO_TEST));
-	com_info_pairs.insert(info_pair_t( OPCOD_GPIO_TEST,"254, OPCOD_GPIO_TEST , use: 254 + enter")); 
+	com_info_pairs.insert(info_pair_t( OPCOD_GPIO_TEST,"254, GPIO_TEST , use: 254 1 [enter]")); 
 	
 	
 	command_pairs.insert(command_pair_t( "exit",EXIT));
@@ -124,14 +124,14 @@ void write_serial_cmd(uint8_t lpBuffer[], size_t sz ){
 /*read serial responce*/
 void read_serial_resp(uint8_t * sRsp){
 	//read   
-    char TempChar; //Temporary character used for reading
+    char TempChar;                               //Temporary character used for reading
 	uint8_t SerialBuffer[SERIAL_BUFFER_MAX_SIZE];//Buffer for storing Rxed Data
 	DWORD NoBytesRead;
 	int i = 0;
 	
 	do
 	 {
-	   ReadFile( serialHandle,           //Handle of the Serial port
+	   ReadFile( serialHandle,    //Handle of the Serial port
 	             &TempChar,       //Temporary character
 	             sizeof(TempChar),//Size of TempChar
 	             &NoBytesRead,    //Number of bytes read
@@ -179,7 +179,7 @@ void cmd(void){
 	string  userInput;
 	string cmdArgs[CMD_ARGS_MAX_NUM];
 	int argc;
-	memset(gSerialBuffer,0,SERIAL_BUFFER_MAX_SIZE);
+	
 	do{
 		getline(std::cin, userInput);
 		parseUserInput(userInput,cmdArgs,&argc);
@@ -270,6 +270,7 @@ void cmd(void){
 			}
 			
 			case OPCOD_GPIO_TEST:{
+				memset(gSerialBuffer,0,SERIAL_BUFFER_MAX_SIZE);
 				/*
 				PD0	A2D	CS_UVC1	Analog measurment UVC1
 				PD1		CS_UVC2	Analog measurment UVC2
@@ -281,7 +282,11 @@ void cmd(void){
 				
 				takeFromFile("./cmd254.txt", CMD_AR,sz);
 				CMD_AR[CMD_ARR_SN_INDEX] = sn;
-				  
+				
+				if(1 <= argc){
+				
+					CMD_AR[8] =	stoi(cmdArgs[1]);
+				}
 				sn_wait_cnt = 0;
 				do{
 					write_serial_cmd( CMD_AR, sz);
@@ -292,14 +297,14 @@ void cmd(void){
 					}
 				}while(sn != gSerialBuffer[CMD_ARR_SN_INDEX]);
 				
-				if(MAX_SN_WAIT >= sn_wait_cnt){
+				if(sn == gSerialBuffer[CMD_ARR_SN_INDEX] && OPCOD_GPIO_TEST == gSerialBuffer[CMD_ARR_SN_INDEX+1] ){
 					cout << "###########################################"<<endl;
-					printf("Analog measurment UVC1 %d% \n",gSerialBuffer[8] );
-					printf("Analog measurment UVC2 %d% \n",gSerialBuffer[9] );
-					printf("Analog measurment UVC3 %d% \n",gSerialBuffer[10] );
-					printf("Analog measurment UVC4 %d% \n",gSerialBuffer[11] );
-					printf("MODE_SELECT %d% \n",gSerialBuffer[12] );
-					printf("PIR_IN %d% \n",gSerialBuffer[13] );
+					printf("Analog measurment UVC1 %d[V] \n",gSerialBuffer[8] );
+					printf("Analog measurment UVC2 %d[V] \n",gSerialBuffer[9] );
+					printf("Analog measurment UVC3 %d[V] \n",gSerialBuffer[10] );
+					printf("Analog measurment UVC4 %d[V] \n",gSerialBuffer[11] );
+					printf("MODE_SELECT %d  \n",gSerialBuffer[12] );
+					printf("PIR_IN %d  \n",gSerialBuffer[13] );
 					cout << "###########################################"<<endl;
 					
 				}else{
