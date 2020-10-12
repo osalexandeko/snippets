@@ -8,6 +8,11 @@
 #include <windows.h>
 #include <stdint.h>
 #include <string>
+#include<pthread.h>
+
+ 
+
+
 using namespace std; 
 
 
@@ -56,6 +61,13 @@ typedef enum {
 	CMD_142,
 	CMD_145,
 	CMD_146,
+	CMD_150,
+	CMD_151,
+	CMD_152,
+	CMD_156,
+	CMD_157,
+	CMD_158,
+	CMD_159,
 	OPCOD_GPIO_TEST                 = 254,
 	
 }command_index_t;
