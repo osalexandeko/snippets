@@ -1,0 +1,41 @@
+Info: Checking netlist symbol footprint "Q1:/5F95B400:Package_TO_SOT_THT:TO-92_Inline".
+Info: Checking netlist symbol footprint "J2:/5F965E02:".
+Info: Checking netlist symbol footprint "J1:/5F966B79:".
+Info: Checking netlist symbol footprint "C3:/5F960133:".
+Info: Checking netlist symbol footprint "J3:/5F9651CF:".
+Info: Checking netlist symbol footprint "C2:/5F95E6B5:".
+Info: Checking netlist symbol footprint "C1:/5F95EEAB:".
+Info: Checking netlist symbol footprint "R1:/5F95D4EC:".
+Info: Checking netlist symbol footprint "R2:/5F95D7F6:".
+Info: Checking netlist symbol footprint "R3:/5F95CFC3:".
+Info: Checking netlist symbol footprint "R4:/5F95D973:".
+Error: Cannot add new symbol R1 due to missing footprint .
+Error: Cannot add new symbol C3 due to missing footprint .
+Error: Cannot add new symbol J3 due to missing footprint .
+Error: Cannot add new symbol R2 due to missing footprint .
+Error: Cannot add new symbol R3 due to missing footprint .
+Error: Cannot add new symbol J2 due to missing footprint .
+Error: Cannot add new symbol R4 due to missing footprint .
+Error: Cannot add new symbol J1 due to missing footprint .
+Error: No footprint defined for symbol "R3".
+
+Error: Cannot add new symbol C2 due to missing footprint .
+Error: Cannot add new symbol C1 due to missing footprint .
+Error: No footprint defined for symbol "J1".
+
+Error: No footprint defined for symbol "J2".
+
+Error: No footprint defined for symbol "J3".
+
+Error: No footprint defined for symbol "C3".
+
+Error: No footprint defined for symbol "C1".
+
+Error: No footprint defined for symbol "C2".
+
+Error: No footprint defined for symbol "R4".
+
+Error: No footprint defined for symbol "R2".
+
+Error: No footprint defined for symbol "R1".
+
