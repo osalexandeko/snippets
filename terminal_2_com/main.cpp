@@ -69,7 +69,7 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	com_info_pairs.insert(info_pair_t( CMD_152,"152 : Set/Clear UVX Lamp into/From UVC Mode "));
 	 
 	command_pairs.insert(command_pair_t( "156",CMD_156));
-	com_info_pairs.insert(info_pair_t( CMD_156,"156 : UVX Lamp / Light gonfig set dim"));
+	com_info_pairs.insert(info_pair_t( CMD_156,"156 1/"": UVX Lamp / Light gonfig set dim, 156 1 => uvc , 156 => light"));
 
 	command_pairs.insert(command_pair_t( "157",CMD_157));
 	com_info_pairs.insert(info_pair_t( CMD_157,"157 : UVX Lamp / Light gonfig get dim"));
@@ -81,7 +81,12 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	com_info_pairs.insert(info_pair_t( CMD_159,"159 : UVX Lamp / Light gonfig get min dim"));
 	
 	
+	command_pairs.insert(command_pair_t( "160",CMD_160));
+	com_info_pairs.insert(info_pair_t( CMD_160,"160 : sets presets table indices."));
 	
+	command_pairs.insert(command_pair_t( "161",CMD_161));
+	com_info_pairs.insert(info_pair_t( CMD_161,"161 : sets tune preset ."));
+
 	
 	command_pairs.insert(command_pair_t( "254",OPCOD_GPIO_TEST));
 	com_info_pairs.insert(info_pair_t( OPCOD_GPIO_TEST,"254, GPIO_TEST , use: 254 1 [enter]")); 
@@ -388,8 +393,16 @@ void cmd(void){
 			
 			case CMD_156:{
 				
-				takeFromFile("./cmd156.txt", CMD_AR,sz);
+				if (1 <= argc){
+					takeFromFile("./cmd156uvc.txt", CMD_AR,sz);
+				}else{
+					takeFromFile("./cmd156light.txt", CMD_AR,sz);
+				}
+				
+				 
 				CMD_AR[CMD_ARR_SN_INDEX] = sn;
+				
+				
 				printf("cmd156, please wait for response ...\n");
 				write_serial_cmd( CMD_AR, sz);  
 	             
@@ -416,6 +429,22 @@ void cmd(void){
 				takeFromFile("./cmd159.txt", CMD_AR,sz);
 				CMD_AR[CMD_ARR_SN_INDEX] = sn;
 				printf("cmd159, please wait for response ...\n");
+				write_serial_cmd( CMD_AR, sz);  
+	           	break;
+			}
+			
+			case CMD_160:{
+				takeFromFile("./cmd160.txt", CMD_AR,sz);
+				CMD_AR[CMD_ARR_SN_INDEX] = sn;
+				printf("cmd160, please wait for response ...\n");
+				write_serial_cmd( CMD_AR, sz);  
+	           	break;
+			}
+			
+			case CMD_161:{
+				takeFromFile("./cmd161.txt", CMD_AR,sz);
+				CMD_AR[CMD_ARR_SN_INDEX] = sn;
+				printf("cmd161, please wait for response ...\n");
 				write_serial_cmd( CMD_AR, sz);  
 	           	break;
 			}
@@ -499,6 +528,13 @@ void* serial_listener(void*arg){
 
 /*the main function*/
 int main(int argc, char** argv) { 
+
+	printf("File :%s\n", __FILE__ );
+    printf("Date :%s\n", __DATE__ );
+    printf("Time :%s\n", __TIME__ );
+    printf("Line :%d\n", __LINE__ );
+    printf("ANSI :%d\n", __STDC__ );
+
 	
  	if(MAIN_ARGS_MIN_NUMBER > argc ){
 		cout << "enter com port and serial number, example : COM15 77"<< endl;

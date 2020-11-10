@@ -31,6 +31,10 @@ public:
         cout << "In Derived from derived \n"; 
     } 
 }; 
+
+void func(void){
+	printf("func \n");
+}
   
 int main(void) 
 { 
@@ -39,6 +43,11 @@ int main(void)
     bp->show(); 
     Base* bpd = new Derived_from_Derived; 
     // RUN-TIME POLYMORPHISM 
+    
+    void * v = (void * )func;
+    void (* fptr)() = (void (*)()) v;
+    fptr();
+    
     bpd->show(); 
     void (**vt)() = *(void (***)())bpd;
     return 0; 

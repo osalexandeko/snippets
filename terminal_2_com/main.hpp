@@ -68,6 +68,8 @@ typedef enum {
 	CMD_157,
 	CMD_158,
 	CMD_159,
+	CMD_160,
+	CMD_161,
 	OPCOD_GPIO_TEST                 = 254,
 	
 }command_index_t;
