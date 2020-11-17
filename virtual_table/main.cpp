@@ -28,7 +28,8 @@ class Derived_from_Derived : public Derived {
 public: 
     void show() 
     { 
-        cout << "In Derived from derived \n"; 
+        cout << "In Derived from derived \n";
+		Derived::show();
     } 
 }; 
 
