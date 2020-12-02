@@ -85,7 +85,7 @@ void initCommands(command_pair_map_t & command_pairs, info_pair_map_t & com_info
 	com_info_pairs.insert(info_pair_t( CMD_160,"160 : sets presets table indices."));
 	
 	command_pairs.insert(command_pair_t( "161",CMD_161));
-	com_info_pairs.insert(info_pair_t( CMD_161,"161 : sets tune preset ."));
+	com_info_pairs.insert(info_pair_t( CMD_161,"161 : gets presets table indices."));
 
 	
 	command_pairs.insert(command_pair_t( "254",OPCOD_GPIO_TEST));
